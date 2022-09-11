@@ -30,4 +30,21 @@ async def brasileirao():
     #deletando a coluna Posição, original
     del df['Posição']
 
+    # divide a coluna Recentes em 3 usando regex com grupos nomeados
+    # a expressão (?P<antepenultima>[A-Z]{1}) significa que estamos a procura de um caracter maiúsculo do alfabeto (de A a Z) e apenas 1
+    # a primeira ocorrencia que safistaça essa condição, se chamará "antepenultima"
+    # em seguinda, usamos a expressão \s* que significa 0 ou mais caracteres de espaço e continuamos com uma expressão semelhante a anterior.
+    # e depois repetimos mais 1 vez, dado que sabemos que são exibidos somente os 3 últimos resultados
+    recent_results = df["Recentes"].str.extract('(?P<antepunultima>[A-Z]{1})\s*(?P<penultima>[A-Z]{1})\s*(?P<ultima>[A-Z]{1})', expand=True)
+    df.insert(column="Antepenúltimo", value=recent_results["antepunultima"], loc=df.shape[1])
+    df.insert(column="Penúltimo", value=recent_results["penultima"], loc=df.shape[1])
+    df.insert(column="Último", value=recent_results["ultima"], loc=df.shape[1])
+
+    #  remove a coluna 'Recentes'
+    del df["Recentes"]
+
+    # aplicamos a função get_dummies para converter as colunas categóricas em variáveis dummy
+    # https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html
+    df = pd.get_dummies(df, columns=["Antepenúltimo", "Penúltimo", "Último"])
+
     return df.to_dict(orient='records')
