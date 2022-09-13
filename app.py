@@ -30,6 +30,12 @@ async def brasileirao():
     #deletando a coluna Posição, original
     del df['Posição']
 
+    # divide a coluna Time em Time e UF usando regex com grupos não nomeados
+    teams_ufs = df["Time"].str.extract('(^.*[^\s])\s+\-\s+([A-Z]{2})', expand=True)
+    del df["Time"]
+    df.insert(column="Time", value=teams_ufs[0], loc=1)
+    df.insert(column="UF", value=teams_ufs[1], loc=2)
+
     # divide a coluna Recentes em 3 usando regex com grupos nomeados
     # a expressão (?P<antepenultima>[A-Z]{1}) significa que estamos a procura de um caracter maiúsculo do alfabeto (de A a Z) e apenas 1
     # a primeira ocorrencia que safistaça essa condição, se chamará "antepenultima"
