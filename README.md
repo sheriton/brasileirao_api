@@ -17,3 +17,4 @@ For this we will use the following packages/tools:
 - request
 - fastapi
 - uvicorn
+- lxml
