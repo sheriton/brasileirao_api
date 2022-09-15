@@ -1,6 +1,8 @@
+import re
 from fastapi import FastAPI
 import pandas as pd
 import requests
+from sqlalchemy import create_engine
 
 app = FastAPI()
 
@@ -53,4 +55,9 @@ async def brasileirao():
     # https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html
     df = pd.get_dummies(df, columns=["Antepenúltimo", "Penúltimo", "Último"])
 
-    return df.to_dict(orient='records')
+    #criando banco de dados, tabela, adicionando os dados do Dataframe na tabela
+    engine = create_engine('sqlite://', echo=False)
+    df.to_sql('tabela_classificacao', con=engine, if_exists='replace')
+    result = engine.execute('SELECT * FROM tabela_classificacao').fetchall()
+
+    return(result)
